@@ -7,6 +7,16 @@ import (
 	"github.com/pocketbase/pocketbase/tools/hook"
 )
 
+// SkipSuccessfulHealthCheckLog prevents routine Docker health checks from being
+// persisted while retaining failed health checks for diagnostics.
+func SkipSuccessfulHealthCheckLog(e *core.RequestEvent) error {
+	if e.Request.URL.Path == "/api/health" {
+		return apis.SkipSuccessActivityLog().Func(e)
+	}
+
+	return e.Next()
+}
+
 func RequireScanDevicesPermission() *hook.Handler[*core.RequestEvent] {
 	return &hook.Handler[*core.RequestEvent]{
 		Func: func(e *core.RequestEvent) error {
